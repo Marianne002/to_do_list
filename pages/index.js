@@ -28,15 +28,14 @@ function HomePage() {
     });
   };
 
-  const toggleTaskCompletion = async (id) => {
-    const task = tasks.find(task => task._id === id);
+  const toggleTaskCompletion = async (id, completed) => {
     const response = await fetch(`/api/tasks?id=${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ completed: !task.completed }),
+      body: JSON.stringify({ completed: completed }),
     });
     if (response.ok) {
-      setTasks(tasks.map(task => (task._id === id ? { ...task, completed: !task.completed } : task)));
+      setTasks(tasks.map(task => (task._id === id ? { ...task, completed: !completed } : task)));
     }
   };
 
@@ -79,7 +78,7 @@ function HomePage() {
         <li key={task._id} style={{ textDecoration: task.completed ? 'line-through' : 'none'}}>
           {task.text}
           <div>
-            <button onClick={() => toggleTaskCompletion(task.id)}>
+            <button onClick={() => toggleTaskCompletion(task._id)}>
             {task.completed ? 'Marquer comme non complétée' : 'Marquer comme complétée'}
             </button>
             <button id='edit' onClick={() => editTask(task._id, prompt("Modifier la tâche", task.text))}>Modifier</button>

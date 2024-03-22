@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
         const updatedTask = await collection.findOneAndUpdate(
           { _id: new ObjectId(req.query.id) },
-          { $set: req.body },
+          { $set: { completed: !taskToUpdate.completed } },
           { returnDocument: 'after' }
         );
 

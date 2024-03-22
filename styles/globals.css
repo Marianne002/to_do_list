@@ -56,3 +56,20 @@ button:hover {
   text-decoration: line-through;
   color: #777;
 }
+
+#new{
+  background-color: green;
+  margin-bottom: 16px;
+  margin: auto;
+  display: block;
+}
+
+#edit{
+  background-color: orange;
+  margin-left: 4px;
+  margin-right  : 4px;
+}
+
+#delete{
+  background-color: red;
+}

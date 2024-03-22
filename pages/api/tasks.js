@@ -21,42 +21,38 @@ export default async function handler(req, res) {
         break;
       case 'PUT':
         // Valider l'ID
-        if (!ObjectId.isValid(req.body._id)) {
+        if (!ObjectId.isValid(req.query.id)) {
           return res.status(400).json({ message: 'Invalid task ID.' });
         }
 
-        const updateData = {};
-        if (req.body.text !== undefined) updateData.text = req.body.text;
-        if (req.body.completed !== undefined) updateData.completed = req.body.completed;
+        const taskToUpdate = await collection.findOne({ _id: new ObjectId(req.query.id) });
 
-        const updateResult = await collection.updateOne(
-          { _id: new ObjectId(req.body._id) },
-          { $set: updateData }
-        );
-
-        if (updateResult.matchedCount === 0) {
+        if (!taskToUpdate) {
           return res.status(404).json({ message: 'Task not found.' });
         }
 
-        res.status(200).json(updateResult);
+        const updatedTask = await collection.findOneAndUpdate(
+          { _id: new ObjectId(req.query.id) },
+          { $set: req.body },
+          { returnDocument: 'after' }
+        );
+
+        res.status(200).json(updatedTask.value);
         break;
       case 'DELETE':
         // Valider l'ID
-        if (!ObjectId.isValid(req.body._id)) {
+        if (!ObjectId.isValid(req.query.id)) {
           return res.status(400).json({ message: 'Invalid task ID.' });
         }
 
-        const deleteResult = await collection.deleteOne({ _id: new ObjectId(req.body._id) });
+        const deleteResult = await collection.deleteOne({ _id: new ObjectId(req.query.id) });
 
         if (deleteResult.deletedCount === 0) {
           return res.status(404).json({ message: 'Task not found.' });
         }
 
-        res.status(200).json(deleteResult);
+        res.status(204).end();
         break;
-      default:
-        res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

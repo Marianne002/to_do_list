@@ -2,9 +2,6 @@ import { useState, useEffect } from 'react';
 
 function HomePage() {
   const [tasks, setTasks] = useState([]);
-  const [taskText, setTaskText] = useState('');
-  const [editingId, setEditingId] = useState(null);
-  const [editText, setEditText] = useState('');
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -20,100 +17,78 @@ function HomePage() {
     fetchTasks();
   }, [tasks]);
 
-  const addTask = async (e) => {
-    e.preventDefault();
-    if (!taskText.trim()) return;
+  const addTask = async (text) => {
+    if (text.trim() === '') {
+      return; // vérifie que le texte n'est pas vide
+    }
     const response = await fetch('/api/tasks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: taskText }),
+      body: JSON.stringify({ text: text }),
     });
-    if (response.ok) {
-      const newTask = await response.json();
-      setTasks((prevTasks) => [...prevTasks, newTask]);
-      setTaskText('');
-    }
   };
 
-  const toggleCompletion = async (id) => {
+  const toggleTaskCompletion = async (id) => {
     const task = tasks.find(task => task._id === id);
-    const response = await fetch(`/api/tasks/${id}`, {
+    const response = await fetch(`/api/tasks?id=${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ completed: !task.completed }),
     });
     if (response.ok) {
-      setTasks(tasks.map((task) => task._id === id ? { ...task, completed: !task.completed } : task));
+      setTasks(tasks.map(task => (task._id === id ? { ...task, completed: !task.completed } : task)));
     }
   };
 
-  const startEditing = (id, text) => {
-    setEditingId(id);
-    setEditText(text);
-  };
-
-  const saveEdit = async (id) => {
-    const response = await fetch(`/api/tasks/${id}`, {
+  const editTask = async (id, text) => {
+    if (text.trim() === '') {
+      return; // vérifie que le texte n'est pas vide encore
+    }
+    const response = await fetch(`/api/tasks?id=${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: editText }),
+      body: JSON.stringify({ text: text }),
     });
     if (response.ok) {
-      setTasks(tasks.map((task) => (task._id === id ? { ...task, text: editText } : task)));
-      setEditingId(null);
-      setEditText('');
+      setTasks(tasks.map(task => (task._id === id ? { ...task, text: text } : task)));
     }
-  };
+  }
 
   const deleteTask = async (id) => {
-    const response = await fetch(`/api/tasks/${id}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (response.ok) {
-      setTasks(tasks.filter((task) => task._id !== id));
+    try {
+      const response = await fetch(`api/tasks?id=${id}`, {
+        method: 'DELETE',
+      });
+        if (!response.ok) {
+            throw new Error('Failed to delete task');
+        }
+          setTasks(tasks.filter(task => task._id !== id));
+      } catch (error) {
+          console.error('Erreur lors de la suppression de la tâche', error);
     }
-  };
+};
+
 
   return (
     <div>
-      <h1>Todo List</h1>
-      <form onSubmit={addTask}>
-        <input
-          type="text"
-          placeholder="Ajouter une nouvelle tâche"
-          value={taskText}
-          onChange={(e) => setTaskText(e.target.value)}
-        />
-        <button type="submit">Ajouter</button>
-      </form>
-      <ul>
-        {tasks.map((task) => (
-          <li key={task._id} style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
-            {editingId === task._id ? (
-              <>
-                <input
-                  type="text"
-                  value={editText}
-                  onChange={(e) => setEditText(e.target.value)}
-                />
-                <button onClick={() => saveEdit(task._id)}>Save</button>
-                <button onClick={() => setEditingId(null)}>Cancel</button>
-              </>
-            ) : (
-              <>
-                {task.text}
-                <button onClick={() => toggleCompletion(task._id)}>
-                  {task.completed ? 'Marquer comme non complétée' : 'Marquer comme complétée'}
-                </button>
-                <button onClick={() => startEditing(task._id, task.text)}>Edit</button>
-                <button onClick={() => deleteTask(task._id)}>Delete</button>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <h1>Ma Liste de Tâches</h1>
+    <ul>
+      <button id='new' onClick={() => addTask(prompt("Nouvelle tâche"))}>Ajouter une tâche</button>
+      <hr />
+      {tasks.map((task) => (
+        <li key={task._id} style={{ textDecoration: task.completed ? 'line-through' : 'none'}}>
+          {task.text}
+          <div>
+            <button onClick={() => toggleTaskCompletion(task.id)}>
+            {task.completed ? 'Marquer comme non complétée' : 'Marquer comme complétée'}
+            </button>
+            <button id='edit' onClick={() => editTask(task._id, prompt("Modifier la tâche", task.text))}>Modifier</button>
+            <button id='delete' onClick={() => deleteTask(task._id)}>Supprimer</button>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
   );
 }
 

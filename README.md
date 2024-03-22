@@ -19,3 +19,14 @@ C'est un point de départ pour un travail pratique où vous devrez améliorer l'
 
 ## Déploiement sur Vercel :
    - https://to-do-list-ovllc7zo9-marianne-grandjeans-projects.vercel.app
+
+
+## Instructions pour Développement Local
+
+- Faire un `npm install`
+- Créer un fichier à la base du projet : .env.local
+- Mettez dans le fichier : 
+   - `MONGODB_URI=URIMongoDb`
+   - `MONGODB_DB=NomBDD`
+
+

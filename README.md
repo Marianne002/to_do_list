@@ -26,7 +26,7 @@ C'est un point de départ pour un travail pratique où vous devrez améliorer l'
 - Faire un `npm install`
 - Créer un fichier à la base du projet : .env.local
 - Mettez dans le fichier : 
-   - MONGODB_URI=URIMongoDb
-   - MONGODB_DB=NomBDD
+   - `MONGODB_URI=URIMongoDb`
+   - `MONGODB_DB=NomBDD`
 
 

@@ -18,8 +18,7 @@ C'est un point de départ pour un travail pratique où vous devrez améliorer l'
 
 
 ## Déploiement sur Vercel :
-   - https://to-do-list-ovllc7zo9-marianne-grandjeans-projects.vercel.app
-
+   - https://to-do-list-9amehym7p-marianne-grandjeans-projects.vercel.app/
 
 ## Instructions pour Développement Local
 
